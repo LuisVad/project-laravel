@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UsuarioController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +14,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Redirigir la ruta raíz a la vista de usuarios o a la ruta de índice de usuarios
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('usuarios.index');
 });
+
+// Rutas para el controlador UsuarioController usando Route::resource
+Route::resource('usuarios', UsuarioController::class);
+
+?>
