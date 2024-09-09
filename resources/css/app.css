@@ -1,0 +1,4 @@
+/* public/css/app.css */
+.invalid-feedback {
+    display: none; /* Oculta los mensajes de error por defecto */
+}
