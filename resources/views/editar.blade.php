@@ -17,7 +17,7 @@
     	<div class="mb-3">
         	<label for="apellido_paterno" class="form-label">Apellido Paterno</label>
         	<input type="text" class="form-control" id="apellido_paterno" name="apellido_paterno" value="{{ $usuario->apellido_paterno }}">
-        	<div class="invalid-feedback" id="apellidoPaternoFeedback"></div>
+        	<div class="invalid-feedback" id="apellido_paternoFeedback"></div>
     	</div>
     	<div class="mb-3">
         	<label for="apellido_materno" class="form-label">Apellido Materno</label>
@@ -27,7 +27,7 @@
     	<div class="mb-3">
         	<label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
         	<input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ $usuario->fecha_nacimiento }}">
-        	<div class="invalid-feedback" id="fechaNacimientoFeedback"></div>
+        	<div class="invalid-feedback" id="fecha_nacimientoFeedback"></div>
     	</div>
     	<div class="mb-3">
         	<label for="ciudad" class="form-label">Ciudad</label>
@@ -95,7 +95,7 @@
                 	<p>Por favor, completa todos los campos obligatorios antes de guardar.</p>
             	</div>
             	<div class="modal-footer">
-                	<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                	<button type="button" class="btn btn-warning" data-dismiss="modal">Cerrar</button>
             	</div>
         	</div>
     	</div>
@@ -141,7 +141,7 @@
                     		}
 		
                     		if (errors.apellido_paterno) {
-                        		$('#apellidoPaternoFeedback').text("Este campo es requerido").show();
+                        		$('#apellido_paternoFeedback').text("Este campo es requerido").show();
                         		$('#apellido_paterno').addClass('is-invalid');
                     		}
                     		if (errors.apellido_materno) {
@@ -193,7 +193,7 @@
 		
             		// Solo ocultar si el campo tiene un valor válido
             		if ($(this).val().trim() !== '') {
-                		console.log("Si");
+                		//console.log("Si");
                 		console.log("Texto antes:", $(feedbackId).text()); // Verifica el texto del mensaje de error antes
                 		$(feedbackId).text(''); // Eliminar el texto del mensaje de error
                 		$(feedbackId).hide(); // Ocultar el mensaje de error
