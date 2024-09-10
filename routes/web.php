@@ -21,5 +21,7 @@ Route::get('/', function () {
 
 // Rutas para el controlador UsuarioController usando Route::resource
 Route::resource('usuarios', UsuarioController::class);
+Route::post('/usuarios/checkFechaNacimiento', [UsuarioController::class, 'checkFechaNacimiento'])->name('usuarios.checkFechaNacimiento');
+
 
 ?>

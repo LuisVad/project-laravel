@@ -326,6 +326,9 @@
             	}
         	})
         	.then(response => {
+				if (!response.ok) {
+					throw new Error('Error al obtener los datos del usuario.');
+				}
             	return response.json(); // Parsear la respuesta JSON
         	})
         	.then(data => {

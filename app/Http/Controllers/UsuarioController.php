@@ -80,44 +80,48 @@ class UsuarioController extends Controller
 
     // Actualizar el usuario especificado en la base de datos
     public function update(Request $request, $id)
-	{
-    	$validator = Validator::make($request->all(), [
-        	'nombre' => 'sometimes|required|string|max:255',
-        	'apellido_materno' => 'sometimes|required|string|max:255',
-        	'apellido_paterno' => 'sometimes|required|string|max:255',
-        	'fecha_nacimiento' => 'sometimes|required|date',
-        	'ciudad' => 'sometimes|required|string|max:255',
-        	'estado' => 'sometimes|required|string|max:255',
-        	'nacionalidad' => 'sometimes|required|string|max:255',
-        	'correo' => 'sometimes|required|string|email|max:255|unique:usuarios,correo,' . $id,
-        	'contraseña' => 'nullable|string|min:8',
-    	]);
-	
-    	if ($validator->fails()) {
-        	return response()->json($validator->errors(), 422);
-    	}
-	
-    	$usuario = Usuario::find($id);
-    	if (!$usuario) {
-        	return response()->json(['message' => 'Usuario no encontrado'], 404);
-    	}
-	
-    	$usuario->update([
-        	'nombre' => $request->nombre ?? $usuario->nombre,
-        	'apellido_materno' => $request->apellido_materno ?? $usuario->apellido_materno,
-        	'apellido_paterno' => $request->apellido_paterno ?? $usuario->apellido_paterno,
-        	'fecha_nacimiento' => $request->fecha_nacimiento ?? $usuario->fecha_nacimiento,
-        	'ciudad' => $request->ciudad ?? $usuario->ciudad,
-        	'estado' => $request->estado ?? $usuario->estado,
-        	'nacionalidad' => $request->nacionalidad ?? $usuario->nacionalidad,
-        	'correo' => $request->correo ?? $usuario->correo,
-        	'contraseña' => $request->contraseña ? Hash::make($request->contraseña) : $usuario->contraseña,
-    	]);
-    	
-	
-    	return response()->json(['status' => 'success']);
-	}
-	
+    {
+        // Validar los datos de entrada
+        $validator = Validator::make($request->all(), [
+            'nombre' => 'sometimes|required|string|max:255',
+            'apellido_materno' => 'sometimes|required|string|max:255',
+            'apellido_paterno' => 'sometimes|required|string|max:255',
+            'ciudad' => 'sometimes|required|string|max:255',
+            'estado' => 'sometimes|required|string|max:255',
+            'nacionalidad' => 'sometimes|required|string|max:255',
+            'correo' => 'sometimes|required|string|email|max:255|unique:usuarios,correo,' . $id,
+            'contraseña' => 'nullable|string|min:8',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // Encontrar el usuario por ID
+        $usuario = Usuario::find($id);
+        if (!$usuario) {
+            return response()->json(['message' => 'Usuario no encontrado'], 404);
+        }
+
+        // Verificar que la fecha de nacimiento no ha cambiado
+        if ($request->fecha_nacimiento !== $usuario->fecha_nacimiento) {
+            return response()->json(['status' => 'error', 'message' => 'No se puede modificar la fecha de nacimiento.'], 422);
+        }
+
+        // Actualizar el usuario con los datos proporcionados, excluyendo la fecha de nacimiento
+        $usuario->update([
+            'nombre' => $request->nombre ?? $usuario->nombre,
+            'apellido_materno' => $request->apellido_materno ?? $usuario->apellido_materno,
+            'apellido_paterno' => $request->apellido_paterno ?? $usuario->apellido_paterno,
+            'ciudad' => $request->ciudad ?? $usuario->ciudad,
+            'estado' => $request->estado ?? $usuario->estado,
+            'nacionalidad' => $request->nacionalidad ?? $usuario->nacionalidad,
+            'correo' => $request->correo ?? $usuario->correo,
+            'contraseña' => $request->contraseña ? Hash::make($request->contraseña) : $usuario->contraseña,
+        ]);
+
+        return response()->json(['status' => 'success']);
+    }
 
     // Eliminar el usuario especificado de la base de datos
     public function destroy($id)
