@@ -26,7 +26,7 @@
     	</div>
     	<div class="mb-3">
         	<label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-        	<input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ $usuario->fecha_nacimiento }}">
+        	<input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ $usuario->fecha_nacimiento }}" readonly>
         	<div class="invalid-feedback" id="fecha_nacimientoFeedback"></div>
     	</div>
     	<div class="mb-3">
@@ -61,7 +61,7 @@
 
     <!-- Modal de Éxito -->
 	<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
-    	<div class="modal-dialog" role="document">
+    	<div class="modal-dialog modal-dialog-centered" role="document">
         	<div class="modal-content">
             	<div class="modal-header">
                 	<h5 class="modal-title" id="successModalLabel">Éxito</h5>
@@ -82,7 +82,7 @@
 	
 	<!-- Modal de Advertencia -->
 	<div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel" aria-hidden="true">
-    	<div class="modal-dialog" role="document">
+    	<div class="modal-dialog modal-dialog-centered" role="document">
         	<div class="modal-content">
             	<div class="modal-header">
                 	<h5 class="modal-title" id="warningModalLabel">Advertencia</h5>
@@ -139,7 +139,6 @@
                         		$('#nombreFeedback').text("Este campo es requerido").show(); // Mostrar el mensaje de error
                         		$('#nombre').addClass('is-invalid'); // Agregar la clase de error al input
                     		}
-		
                     		if (errors.apellido_paterno) {
                         		$('#apellido_paternoFeedback').text("Este campo es requerido").show();
                         		$('#apellido_paterno').addClass('is-invalid');
@@ -147,10 +146,6 @@
                     		if (errors.apellido_materno) {
                         		$('#apellidoMaternoFeedback').text("Este campo es requerido").show();
                         		$('#apellido_materno').addClass('is-invalid');
-                    		}
-                    		if (errors.fecha_nacimiento) {
-                        		$('#fechaNacimientoFeedback').text(errors.fecha_nacimiento[0]).show();
-                        		$('#fecha_nacimiento').addClass('is-invalid');
                     		}
                     		if (errors.ciudad) {
                         		$('#ciudadFeedback').text("Este campo es requerido").show();
@@ -194,11 +189,11 @@
             		// Solo ocultar si el campo tiene un valor válido
             		if ($(this).val().trim() !== '') {
                 		//console.log("Si");
-                		console.log("Texto antes:", $(feedbackId).text()); // Verifica el texto del mensaje de error antes
+                		//console.log("Texto antes:", $(feedbackId).text()); // Verifica el texto del mensaje de error antes
                 		$(feedbackId).text(''); // Eliminar el texto del mensaje de error
                 		$(feedbackId).hide(); // Ocultar el mensaje de error
                 		$(this).removeClass('is-invalid'); // Eliminar la clase de error en el input
-                		console.log("Texto después:", $(feedbackId).text()); // Verifica el texto del mensaje de error después
+                		//console.log("Texto después:", $(feedbackId).text()); // Verifica el texto del mensaje de error después
             		} 
         		}
     		});
