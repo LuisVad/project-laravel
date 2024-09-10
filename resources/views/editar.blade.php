@@ -55,8 +55,8 @@
         	<small class="form-text text-muted">Deja este campo vacío si no deseas cambiar la contraseña.</small>
         	<div class="invalid-feedback" id="contraseñaFeedback"></div>
     	</div>
-        <button type="submit" class="btn btn-success">Guardar Cambios</button>
-        <a href="{{ url('/usuarios') }}" class="btn btn-primary">Volver</a>
+        <button type="submit" class="btn btn-success btn-guardar">Guardar Cambios</button>
+        <a href="{{ url('/usuarios') }}" class="btn btn-primary btn-volver">Volver</a>
     </form>
 
     <!-- Modal de Éxito -->
@@ -104,8 +104,9 @@
 
 @section('scripts')
 <script>
-    	$(document).ready(function() {
-    		$('#editForm').on('submit', function(e) {
+    $(document).ready(function() {
+
+    	$('#editForm').on('submit', function(e) {
         		e.preventDefault(); // Prevenir el envío tradicional del formulario
 		
         		// Limpiar mensajes de error anteriores y clases de error
@@ -113,6 +114,14 @@
         		$('input').removeClass('is-invalid');   // Limpiar la clase de error en todos los inputs
 		
         		let formData = $(this).serialize();
+				let submitButton = $(this).find('.btn-guardar');
+
+				// Mostrar el spinner en el botón y deshabilitarlo
+				submitButton.html(`
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+					Cargando...
+				`);
+				submitButton.attr('disabled', true);
 		
         		$.ajax({
             		url: $(this).attr('action'),
@@ -121,11 +130,18 @@
             		success: function(response) {
             			//console.log("Respuesta del servidor:", response);
             			//console.log("Respuesta del servidor:", response.status);
-                		if (response.status === 'success') {
-                    		// Mostrar el modal de éxito si la respuesta es exitosa
-                    		$('#successModal').modal('show');
-                    		startInactivityTimer();
-                		}
+                		// Mostrar el modal de éxito si la respuesta es exitosa
+						if (response.status === 'success') {
+							$('#successModal').modal('show');
+							startInactivityTimer(); // Si es necesario
+
+							// Opcional: Redirigir después de un tiempo si es necesario
+							setTimeout(function() {
+								$('#successModal').modal('hide');
+								// Redirigir o realizar otra acción si es necesario
+								window.location.href = '{{ route('usuarios.index') }}';
+							}, 3000); // Tiempo en milisegundos
+						}
             		},
             		error: function(xhr) {
                 		if (xhr.status === 422) {
@@ -170,14 +186,18 @@
 		
                     		// Mostrar el modal de advertencia
                     		$('#warningModal').modal('show');
-                    		
                 		}
-            		}
+            		},
+					complete: function() {
+						// Restablecer el botón después de la solicitud
+						submitButton.html('Guardar Cambios'); // Texto original del botón
+						submitButton.removeAttr('disabled');
+					}
         		});
-    		});
+    	});
 		
-    		// Escuchar cuando el usuario vuelva a llenar los campos para eliminar los errores
-    		$('input').on('input', function() {
+    	// Escuchar cuando el usuario vuelva a llenar los campos para eliminar los errores
+    	$('input').on('input', function() {
         		let inputId = $(this).attr('id');
         		//console.log("Campo modificado:", inputId); // Depuración para verificar el ID del campo
 		
@@ -196,10 +216,10 @@
                 		//console.log("Texto después:", $(feedbackId).text()); // Verifica el texto del mensaje de error después
             		} 
         		}
-    		});
+    	});
     		
-    		// Función para iniciar el temporizador de inactividad
-    		function startInactivityTimer() {
+    	// Función para iniciar el temporizador de inactividad
+    	function startInactivityTimer() {
         		let time;
         		window.onload = resetTimer;
         		document.onmousemove = resetTimer;
@@ -213,16 +233,15 @@
             		clearTimeout(time);
             		time = setTimeout(logout, 15000);  // 15 segundos
         		}
-    		}
+    	}
 		
-    		// No mostrar ningún modal ni activar el temporizador cuando accedes desde el enlace de editar
-    		if (location.search.includes('edit=true')) {
+    	// No mostrar ningún modal ni activar el temporizador cuando accedes desde el enlace de editar
+    	if (location.search.includes('edit=true')) {
         		console.log("Editing mode - no modals or timers activated.");
         		// Opción: si quieres prevenir la activación de eventos adicionales puedes incluir `return false;`
         		return false;
-    		}
+    	}
     		
-		});
-    
+	});
 </script>
 @endsection
