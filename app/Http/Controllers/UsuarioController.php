@@ -121,13 +121,13 @@ class UsuarioController extends Controller
 
     // Eliminar el usuario especificado de la base de datos
     public function destroy($id)
-    {
-        $usuario = Usuario::find($id);
-        if (!$usuario) {
-            return redirect()->route('usuarios.index')->with('error', 'Usuario no encontrado.');
-        }
-
-        $usuario->delete();
-        return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado con éxito.');
-    }
+	{
+    	$usuario = Usuario::find($id);
+    	if (!$usuario) {
+        	return response()->json(['message' => 'Usuario no encontrado.'], 404);
+    	}
+	
+    	$usuario->delete();
+    	return response()->json(['message' => 'Usuario eliminado con éxito.'], 200);
+	}
 }
