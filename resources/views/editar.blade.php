@@ -132,15 +132,19 @@
             			//console.log("Respuesta del servidor:", response.status);
                 		// Mostrar el modal de éxito si la respuesta es exitosa
 						if (response.status === 'success') {
-							$('#successModal').modal('show');
-							startInactivityTimer(); // Si es necesario
-
-							// Opcional: Redirigir después de un tiempo si es necesario
 							setTimeout(function() {
-								$('#successModal').modal('hide');
-								// Redirigir o realizar otra acción si es necesario
-								window.location.href = '{{ route('usuarios.index') }}';
-							}, 3000); // Tiempo en milisegundos
+								// Mostrar el modal de éxito
+								$('#successModal').modal('show');
+								startInactivityTimer(); // Si es necesario
+								console.log("Aaaa");
+
+								// Ocultar el modal después de otros 3 segundos y redirigir
+								setTimeout(function() {
+									$('#successModal').modal('hide');
+									console.log("Vaa");
+									window.location.href = '{{ route('usuarios.index') }}';
+								}, 8000); // 8 segundos
+							}, 3000); // 3 segundos
 						}
             		},
             		error: function(xhr) {
