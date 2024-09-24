@@ -22,7 +22,7 @@
     	<div class="mb-3">
         	<label for="apellido_materno" class="form-label">Apellido Materno</label>
         	<input type="text" class="form-control" id="apellido_materno" name="apellido_materno" value="{{ $usuario->apellido_materno }}">
-        	<div class="invalid-feedback" id="apellidoMaternoFeedback"></div>
+        	<div class="invalid-feedback" id="apellido_maternoFeedback"></div>
     	</div>
     	<div class="mb-3">
         	<label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
@@ -52,11 +52,10 @@
     	<div class="mb-3">
         	<label for="contraseña" class="form-label">Contraseña</label>
         	<input type="password" class="form-control" id="contraseña" name="contraseña">
-        	<small class="form-text text-muted">Deja este campo vacío si no deseas cambiar la contraseña.</small>
         	<div class="invalid-feedback" id="contraseñaFeedback"></div>
     	</div>
-        <button type="submit" class="btn btn-success">Guardar Cambios</button>
-        <a href="{{ url('/usuarios') }}" class="btn btn-primary">Volver</a>
+        <button type="submit" class="btn btn-success btn-guardar">Guardar Cambios</button>
+        <a href="{{ url('/usuarios') }}" class="btn btn-primary btn-volver">Volver</a>
     </form>
 
     <!-- Modal de Éxito -->
@@ -104,15 +103,36 @@
 
 @section('scripts')
 <script>
-    	$(document).ready(function() {
-    		$('#editForm').on('submit', function(e) {
+    $(document).ready(function() {
+    
+    	// Evento cuando el campo recibe foco
+    	$('#fecha_nacimiento').on('focus', function() {
+        	$('#fecha_nacimientoFeedback').text("Este campo no se puede modificar").show(); // Mostrar el mensaje de error
+        	$('#fecha_nacimiento').addClass('is-invalid'); // Marcar el campo como inválido
+    	});
+	
+    	// Evento cuando el campo pierde foco
+    	$('#fecha_nacimiento').on('blur', function() {
+        	$('#fecha_nacimientoFeedback').hide(); // Ocultar el mensaje de error
+        	$('#fecha_nacimiento').removeClass('is-invalid'); // Remover la clase de error
+    	});
+
+    	$('#editForm').on('submit', function(e) {
         		e.preventDefault(); // Prevenir el envío tradicional del formulario
 		
         		// Limpiar mensajes de error anteriores y clases de error
         		$('.invalid-feedback').text('').hide(); // Limpiar cualquier mensaje anterior y ocultarlo
         		$('input').removeClass('is-invalid');   // Limpiar la clase de error en todos los inputs
 		
-        		let formData = $(this).serialize();
+        		var formData = $(this).serialize();
+				var submitButton = $(this).find('.btn-guardar');
+
+				// Mostrar el spinner en el botón y deshabilitarlo
+				submitButton.html(`
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+					Cargando...
+				`);
+				submitButton.attr('disabled', true);
 		
         		$.ajax({
             		url: $(this).attr('action'),
@@ -121,11 +141,19 @@
             		success: function(response) {
             			//console.log("Respuesta del servidor:", response);
             			//console.log("Respuesta del servidor:", response.status);
-                		if (response.status === 'success') {
-                    		// Mostrar el modal de éxito si la respuesta es exitosa
-                    		$('#successModal').modal('show');
-                    		startInactivityTimer();
-                		}
+                		// Mostrar el modal de éxito si la respuesta es exitosa
+						if (response.status === 'success') {
+							setTimeout(function() {
+								// Mostrar el modal de éxito
+								$('#successModal').modal('show');
+
+								// Ocultar el modal después de 10 segundos y redirigir
+								setTimeout(function() {
+									$('#successModal').modal('hide');
+									window.location.href = '{{ route('usuarios.index') }}';
+								}, 10000); // 10 segundos
+							}, 5000); // 5 segundos
+						}
             		},
             		error: function(xhr) {
                 		if (xhr.status === 422) {
@@ -135,7 +163,6 @@
 		
                     		// Añadir validación para los campos si es necesario
                     		if (errors.nombre) {
-                        		//console.log(errors.nombre[0]); // Esto ya funciona correctamente
                         		$('#nombreFeedback').text("Este campo es requerido").show(); // Mostrar el mensaje de error
                         		$('#nombre').addClass('is-invalid'); // Agregar la clase de error al input
                     		}
@@ -144,7 +171,7 @@
                         		$('#apellido_paterno').addClass('is-invalid');
                     		}
                     		if (errors.apellido_materno) {
-                        		$('#apellidoMaternoFeedback').text("Este campo es requerido").show();
+                        		$('#apellido_maternoFeedback').text("Este campo es requerido").show();
                         		$('#apellido_materno').addClass('is-invalid');
                     		}
                     		if (errors.ciudad) {
@@ -160,7 +187,7 @@
                         		$('#nacionalidad').addClass('is-invalid');
                     		}
                     		if (errors.correo) {
-                        		$('#correoFeedback').text(errors.correo[0]).show();
+                        		$('#correoFeedback').text("Este campo es requerido").show();
                         		$('#correo').addClass('is-invalid');
                     		}
                     		if (errors.contraseña) {
@@ -170,14 +197,20 @@
 		
                     		// Mostrar el modal de advertencia
                     		$('#warningModal').modal('show');
-                    		
                 		}
-            		}
+            		},
+					complete: function() {
+						setTimeout(function() {
+        					// Restablecer el botón 5 segundos después de que se muestre el modal
+        					submitButton.html('Guardar Cambios'); // Texto original del botón
+        					submitButton.removeAttr('disabled'); // Habilitar el botón nuevamente
+    					}, 5000); // 300,000 ms = 5 segundos
+					}
         		});
-    		});
+    	});
 		
-    		// Escuchar cuando el usuario vuelva a llenar los campos para eliminar los errores
-    		$('input').on('input', function() {
+    	// Escuchar cuando el usuario vuelva a llenar los campos para eliminar los errores
+    	$('input').on('input', function() {
         		let inputId = $(this).attr('id');
         		//console.log("Campo modificado:", inputId); // Depuración para verificar el ID del campo
 		
@@ -196,33 +229,15 @@
                 		//console.log("Texto después:", $(feedbackId).text()); // Verifica el texto del mensaje de error después
             		} 
         		}
-    		});
-    		
-    		// Función para iniciar el temporizador de inactividad
-    		function startInactivityTimer() {
-        		let time;
-        		window.onload = resetTimer;
-        		document.onmousemove = resetTimer;
-        		document.onkeypress = resetTimer;
+    	});
 		
-        		function logout() {
-            		window.location.href = '{{ route('usuarios.index') }}';
-        		}
-		
-        		function resetTimer() {
-            		clearTimeout(time);
-            		time = setTimeout(logout, 15000);  // 15 segundos
-        		}
-    		}
-		
-    		// No mostrar ningún modal ni activar el temporizador cuando accedes desde el enlace de editar
-    		if (location.search.includes('edit=true')) {
+    	// No mostrar ningún modal ni activar el temporizador cuando accedes desde el enlace de editar
+    	if (location.search.includes('edit=true')) {
         		console.log("Editing mode - no modals or timers activated.");
         		// Opción: si quieres prevenir la activación de eventos adicionales puedes incluir `return false;`
         		return false;
-    		}
+    	}
     		
-		});
-    
+	});
 </script>
 @endsection
